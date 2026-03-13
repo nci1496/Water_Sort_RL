@@ -9,21 +9,31 @@
 #include <QJsonArray>
 #include <QFile>
 
+#include"path.h"
+
 #include<QCoreApplication> //用于自动退出，QCoreApplication::quit() //only test
 
-GameController::GameController(int bottleCount)
-    : game(bottleCount)
+GameController::GameController(int bottleCount,int capacity)
+    : game(bottleCount,capacity),bottleCount(bottleCount),capacity(capacity)
 {
+    solverProcess = new QProcess(this);
 
     solverTimer = new QTimer(this);
 
     connect(solverTimer,&QTimer::timeout,this,&GameController::stepSolve);
 
+    connect(solverProcess, &QProcess::finished,this, &GameController::onSolverFinished);
+    connect(solverProcess,&QProcess::started,[](){qDebug()<<"solverProcess started";});
+
+    connect(solverProcess,&QProcess::readyReadStandardOutput,[=](){qDebug()<<solverProcess->readAllStandardOutput();});
+
+    connect(solverProcess,&QProcess::readyReadStandardError,[=](){qDebug()<<"ERR:"<<solverProcess->readAllStandardError();});
+
 }
 
 void GameController::newGame(int colorCount)
 {
-    game = GameState(game.bottles.size());
+    game = GameState(bottleCount,capacity);
 
     LevelGenerator::generate(game,colorCount);
 }
@@ -42,23 +52,28 @@ const GameState& GameController::getGame() const
     return game;
 }
 
-bool GameController::solveWithPython()
+void GameController::solveWithPython()
 {
-    QProcess process;
+    QString program = "python";
 
-    process.setWorkingDirectory("../../rl");
+    QStringList args;
+    args << pyPath << levelPath << solutionPath;
 
-    process.start("python", QStringList() << "solver.py");
+    qDebug()<<"start python:";
+    qDebug()<<program;
+    qDebug()<<args;
 
-    process.waitForFinished();
+    solverProcess->start(program,args);
 
-    qDebug() << process.readAllStandardOutput();
-
-    return true;
+    if(!solverProcess->waitForStarted())
+    {
+        qDebug()<<"Python start failed";
+    }
 }
 
 bool GameController::loadSolution(const QString &path)
 {
+    qDebug()<<"Loading solution from :"<<path<<Qt::endl;
     QFile file(path);
 
     if(!file.open(QIODevice::ReadOnly))
@@ -112,12 +127,18 @@ void GameController::executeSolution()
 
 void GameController::startAutoSolve()
 {
-    currentStep=0;
-    solverTimer->start(500);
+    //currentStep=0;
+    //solverTimer->start(500);
 }
 
 void GameController::stepSolve()
 {
+    if(solution.empty())
+    {
+        qDebug()<<"No solution loaded";
+        return;
+    }
+
     if(currentStep >= solution.size())
     {
         solverTimer->stop();
@@ -137,6 +158,29 @@ void GameController::stepSolve()
         qDebug()<<"Move"<<from<<"->"<<to;
     }
     emit gameUpdated(game.bottles);//更新UI
+    // emit animatePourSignal(from,to);//弃用了倾斜倒水动画
+    // QTimer::singleShot(350,[this,from,to](){game.pour(from,to);emit gameUpdated(game.bottles);});
     currentStep++;
+}
+
+void GameController::onSolverFinished()
+{
+    qDebug()<<"Python finished";
+
+    if(loadSolution(solutionPath))
+    {
+        qDebug()<<"solution steps:"<<solution.size();
+
+        currentStep = 0;
+        solverTimer->start(400);
+    }
+    else
+    {
+        qDebug()<<"load solution failed";
+    }
+    bool ok = loadSolution(solutionPath);
+
+    qDebug()<<"loadSolution result:"<<ok;
+    qDebug()<<"solution size:"<<solution.size();
 }
 

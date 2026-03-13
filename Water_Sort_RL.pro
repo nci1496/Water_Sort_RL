@@ -22,6 +22,7 @@ HEADERS += \
     qt_game/GameController.h \
     qt_game/GameState.h \
     qt_game/LevelGenerator.h \
+    qt_game/path.h
 
 
 FORMS += \

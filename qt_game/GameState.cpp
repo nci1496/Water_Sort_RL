@@ -9,8 +9,12 @@
 
 #include<QDebug> //only test
 
-GameState::GameState(int bottleCount)
+GameState::GameState(int bottleCount,int capacity)
 {
+
+    this->bottleCount=bottleCount;
+    this->capacity=capacity;
+
     bottles.resize(bottleCount);
 }
 
@@ -24,7 +28,7 @@ int GameState::topColor(int bottle) const
 
 int GameState::emptySpace(int bottle) const
 {
-    return CAPACITY - bottles[bottle].size();
+    return capacity - bottles[bottle].size();
 }
 
 bool GameState::canPour(int from,int to) const
@@ -35,7 +39,7 @@ bool GameState::canPour(int from,int to) const
     if(bottles[from].empty())
         return false;
 
-    if(bottles[to].size() >= CAPACITY)
+    if(bottles[to].size() >= capacity)
         return false;
 
     int color = topColor(from);
@@ -49,8 +53,10 @@ bool GameState::canPour(int from,int to) const
 void GameState::pour(int from,int to)
 {
     if(!canPour(from,to))
+    {
+        qDebug()<<"Invaild:"<<from<<"to"<<to<<Qt::endl;
         return;
-
+    }
     int color = topColor(from);
 
     while(!bottles[from].empty())
@@ -58,7 +64,7 @@ void GameState::pour(int from,int to)
         if(bottles[from].back() != color)
             break;
 
-        if(bottles[to].size() >= CAPACITY)
+        if(bottles[to].size() >= capacity)
             break;
 
         bottles[to].push_back(color);
@@ -73,7 +79,7 @@ bool GameState::isSolved() const
         if(b.empty())
             continue;
 
-        if(b.size() != CAPACITY)
+        if(b.size() != capacity)
             return false;
 
         int color = b[0];
@@ -112,6 +118,21 @@ bool GameState::saveToJson(const QString& path) const
     }
 
     QJsonObject root;
+
+    root["capacity"] = capacity;
+
+    QJsonArray bottleArray;
+
+    for(const auto& b : bottles)
+    {
+        QJsonArray arr;
+
+        for(int c : b)
+            arr.append(c);
+
+        bottleArray.append(arr);
+    }
+
     root["bottles"] = bottlesArray;
 
     QJsonDocument doc(root);

@@ -1,7 +1,5 @@
-import json
+import json,os,sys
 from collections import deque
-
-CAPACITY = 4
 
 
 def is_solved(state):
@@ -59,12 +57,15 @@ def neighbors(state):
             if can_pour(state[i], state[j]):
                 yield (i, j, pour(state, i, j))
 
+script_path=sys.argv[0]
+level_path = sys.argv[1]
+solution_path = sys.argv[2]
 
-# 读取关卡
-with open("../data/level.json", "r") as f:
-    level = json.load(f)
+with open(level_path) as f:
+    data = json.load(f)
 
-start = tuple(tuple(b) for b in level["bottles"])
+CAPACITY = data["capacity"]
+start = tuple(tuple(b) for b in data["bottles"])
 
 queue = deque()
 queue.append(start)
@@ -114,7 +115,6 @@ solution = {
     "moves": moves
 }
 
-with open("../data/solution.json", "w") as f:
+with open(solution_path, "w") as f:
     json.dump(solution, f)
-
-print("Solved in", len(moves), "moves")
+print("Solved in", len(moves), "moves",flush=True)

@@ -3,14 +3,14 @@
 
 #include "GameState.h"
 #include<QTimer>
-
+#include<QProcess>
 
 class GameController: public QObject //
 {
     Q_OBJECT //不加继承自QObject的话，用不了connect
 public:
 
-    GameController(int bottleCount);
+    GameController(int bottleCount,int capacity);
 
     void newGame(int colorCount);
 
@@ -18,7 +18,7 @@ public:
 
     const GameState& getGame() const;
 
-    bool solveWithPython();
+    void solveWithPython();
 
     bool loadSolution(const QString & path);
 
@@ -35,11 +35,17 @@ private:
 
     std::vector<std::pair<int,int>> solution;
 
-    GameState game;
+    int bottleCount;
+    int capacity;
 
+
+    GameState game;
+    QProcess* solverProcess;
+
+    void  onSolverFinished();
 signals:
     void gameUpdated(const std::vector<std::vector<int>>& bottles);
-
+    //void animatePourSignal(int from ,int to);弃用倾斜倒水动画
 };
 
 #endif // GAMECONTROLLER_H

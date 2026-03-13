@@ -11,14 +11,15 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 public:
-
-    MainWindow(QWidget* parent=nullptr);
+    MainWindow(int bottleCount,int capacity,QWidget* parent=nullptr);
 
     void updateGame(const std::vector<std::vector<int>>& bottles);
+
+    //void animatePour(int from,int to);
 
 private:
 
     std::vector<BottleWidget*> bottleWidgets;
-
+    int capacity;
 };
 #endif // MAINWINDOW_H

@@ -1,7 +1,6 @@
 #include <iostream>
-#include "GameController.h"
 #include<QDebug>
-
+#include"GameState.h"
 void printGame(const GameState& game)
 {
     for(int i=0;i<game.bottles.size();i++)
@@ -16,21 +15,20 @@ void printGame(const GameState& game)
     std::cout<<"-------------\n";
 }
 
-
-
 #include <QApplication>
 #include "GameController.h"
 #include "mainwindow.h"
+#include"path.h"
 
 int main(int argc,char* argv[])
 {
     QApplication app(argc,argv);
 
-    GameController controller(6);
+    GameController controller(8,6);
 
-    MainWindow window;
+    MainWindow window(8,6);
 
-    controller.newGame(4);
+    controller.newGame(6);
 
     window.updateGame(controller.getGame().bottles);
 
@@ -38,13 +36,9 @@ int main(int argc,char* argv[])
 
     window.show();
 
-    controller.getGame().saveToJson("../../data/level.json");
+    controller.getGame().saveToJson(levelPath);
 
     controller.solveWithPython();
-
-    controller.loadSolution("../../data/solution.json");
-
-    controller.startAutoSolve();
 
     return app.exec();
 }
