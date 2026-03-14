@@ -3,6 +3,11 @@
 
 #include <QWidget>
 #include <vector>
+
+#include<QSpinBox>
+#include<QPushButton>
+#include<QHBoxLayout>
+
 #include"qt_game/GameController.h"
 class BottleWidget;
 
@@ -17,6 +22,7 @@ public:
 
     //void animatePour(int from,int to);
 
+    void rebuildBoard(int bottleCount);
 private:
 
     std::vector<BottleWidget*> bottleWidgets;
@@ -24,6 +30,17 @@ private:
     int selected =-1;
     GameController* controller;
 
+
+    QSpinBox* bottleSpin;
+    QSpinBox* capacitySpin;
+    QSpinBox* colorSpin;
+
+    QPushButton* newBtn;
+    QPushButton* resetBtn;
+    QPushButton* undoBtn;
+    QPushButton* aiBtn;
+
+    QHBoxLayout* gameLayout;
 
 private:
     void onBottleClicked(BottleWidget* b);

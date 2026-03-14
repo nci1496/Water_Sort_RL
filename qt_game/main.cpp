@@ -24,11 +24,15 @@ int main(int argc,char* argv[])
 {
     QApplication app(argc,argv);
 
-    GameController controller(8,6,6);
+    int bottleCount=8;
+    int capacity=6;
+    int colorCount=7;
+
+    GameController controller(bottleCount,capacity,colorCount);
 
     MainWindow window(&controller);
 
-    controller.newGame();
+    controller.newGame(bottleCount,capacity,colorCount);
 
     window.updateGame(controller.getGame().bottles);
 

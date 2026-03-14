@@ -33,17 +33,19 @@ void BottleWidget::paintEvent(QPaintEvent*)
 
     // ===== 画玻璃瓶 =====
 
-    painter.setPen(QPen(QColor(60,60,60),3));
+    if(selected)
+    {painter.setPen(QPen(QColor(200,200,200),4)); // 黄色高亮
+    }else
+    {   painter.setPen(QPen(QColor(60,60,60),3));}
     painter.setBrush(Qt::NoBrush);
+
+
 
     painter.drawRoundedRect(bottleRect,15,15);
 
     // ===== 计算水层高度 =====
 
-
-
     int waterHeight = (h-40)/capacity;
-
     for(int i=0;i<water.size();i++)
     {
         QColor c;
@@ -112,5 +114,37 @@ void BottleWidget::paintEvent(QPaintEvent*)
 void BottleWidget::mousePressEvent(QMouseEvent *)
 {
     emit clicked(this);
+}
+
+void BottleWidget::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    basePos=pos();
+}
+
+void BottleWidget::setSelected(bool s)
+{
+    if(selected==s)
+    {
+        return;
+    }
+
+    selected=s;
+    int offset=std::min(20,int(height()*0.05));
+
+    qDebug()<<basePos<<","<<height();
+
+    if(selected){
+        move(x(),basePos.y()-offset);
+
+    }
+    else{
+        move(x(),basePos.y());
+    }
+
+
+    update();
+
+
 }
 
