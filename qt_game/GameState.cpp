@@ -9,11 +9,12 @@
 
 #include<QDebug> //only test
 
-GameState::GameState(int bottleCount,int capacity)
+GameState::GameState(int bottleCount,int capacity,int colorCount)
 {
 
     this->bottleCount=bottleCount;
     this->capacity=capacity;
+    this->colorCount=colorCount;
 
     bottles.resize(bottleCount);
 }
@@ -34,19 +35,27 @@ int GameState::emptySpace(int bottle) const
 bool GameState::canPour(int from,int to) const
 {
     if(from == to)
+    {
+        qDebug()<<"1"<<Qt::endl;
         return false;
-
+    }
     if(bottles[from].empty())
+    {
+                qDebug()<<"2"<<Qt::endl;
         return false;
-
+    }
     if(bottles[to].size() >= capacity)
+    {
+                qDebug()<<"3"<<Qt::endl;
         return false;
-
+    }
     int color = topColor(from);
 
     if(!bottles[to].empty() && topColor(to) != color)
+    {
+                qDebug()<<"4"<<Qt::endl;
         return false;
-
+    }
     return true;
 }
 

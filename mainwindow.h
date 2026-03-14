@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <vector>
-
+#include"qt_game/GameController.h"
 class BottleWidget;
 
 class MainWindow : public QWidget
@@ -11,7 +11,7 @@ class MainWindow : public QWidget
     Q_OBJECT
 
 public:
-    MainWindow(int bottleCount,int capacity,QWidget* parent=nullptr);
+    MainWindow(GameController* c,QWidget* parent=nullptr);
 
     void updateGame(const std::vector<std::vector<int>>& bottles);
 
@@ -21,5 +21,13 @@ private:
 
     std::vector<BottleWidget*> bottleWidgets;
     int capacity;
+    int selected =-1;
+    GameController* controller;
+
+
+private:
+    void onBottleClicked(BottleWidget* b);
+
+
 };
 #endif // MAINWINDOW_H

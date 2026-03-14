@@ -40,7 +40,7 @@
 //     // 剩余瓶子保持为空
 // }
 
-void LevelGenerator::generate(GameState& game,int colorCount)
+void LevelGenerator::generate(GameState& game)
 {
     int bottleCount = game.bottleCount;
     int capacity = game.capacity;
@@ -54,13 +54,13 @@ void LevelGenerator::generate(GameState& game,int colorCount)
             b.clear();
 
         // 终局
-        for(int c=0;c<colorCount;c++)
+        for(int c=0;c<game.colorCount;c++)
         {
             for(int i=0;i<capacity;i++)
                 game.bottles[c].push_back(c+1);
         }
 
-        int shuffleSteps = 200;
+        int shuffleSteps = 1000;
 
         for(int step=0;step<shuffleSteps;step++)
         {

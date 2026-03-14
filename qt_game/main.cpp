@@ -24,11 +24,11 @@ int main(int argc,char* argv[])
 {
     QApplication app(argc,argv);
 
-    GameController controller(8,6);
+    GameController controller(8,6,6);
 
-    MainWindow window(8,6);
+    MainWindow window(&controller);
 
-    controller.newGame(6);
+    controller.newGame();
 
     window.updateGame(controller.getGame().bottles);
 
@@ -36,9 +36,9 @@ int main(int argc,char* argv[])
 
     window.show();
 
-    controller.getGame().saveToJson(levelPath);
+    // controller.getGame().saveToJson(levelPath);
 
-    controller.solveWithPython();
+    // controller.solveWithPython();
 
     return app.exec();
 }

@@ -2,27 +2,75 @@
 #include "qt_game/BottleWidget.h"
 #include <QHBoxLayout>
 
-MainWindow::MainWindow(int bottleCount,int capacity,QWidget* parent)
+#include<QPushButton>
+
+MainWindow::MainWindow(GameController* c,QWidget* parent)
     : QWidget(parent)
 {
-    this->capacity=capacity;
-    QHBoxLayout* layout = new QHBoxLayout();
-    layout->setSpacing(15);
-    layout->setContentsMargins(20,20,20,20);
+    controller = c;
 
-    for(int i=0;i<bottleCount;i++)
+    this->capacity=c->getCapacity();
+
+    QVBoxLayout* root = new QVBoxLayout();
+
+    QHBoxLayout* buttons = new QHBoxLayout();
+
+    QPushButton* newBtn = new QPushButton("New Level");
+    QPushButton* resetBtn = new QPushButton("Reset");
+    QPushButton* undoBtn = new QPushButton("Undo");
+    QPushButton* aiBtn = new QPushButton("AI Solve");
+
+    buttons->addWidget(newBtn);
+    buttons->addWidget(resetBtn);
+    buttons->addWidget(undoBtn);
+    buttons->addWidget(aiBtn);
+
+    QHBoxLayout* bottleLayout = new QHBoxLayout();
+    bottleLayout->setSpacing(15);
+    bottleLayout->setContentsMargins(20,20,20,20);
+
+    for(int i=0;i<c->getBottleCount();i++)
     {
         BottleWidget* b = new BottleWidget();
 
         b->setCapacity(capacity);
         bottleWidgets.push_back(b);
 
-        layout->addWidget(b);
+        bottleLayout->addWidget(b);
+        connect(b,&BottleWidget::clicked,this,&MainWindow::onBottleClicked);
     }
 
-    setLayout(layout);
+    root->addLayout(buttons);
+    root->addLayout(bottleLayout);
+
+    setLayout(root);
 
     resize(500,250);
+
+    connect(newBtn,&QPushButton::clicked,this,[=]()
+            {
+        controller->newGame();
+                updateGame(controller->getState().bottles);
+            });
+
+    connect(resetBtn,&QPushButton::clicked,this,[=]()
+            {
+                //controller->reset();
+                updateGame(controller->getState().bottles);
+            });
+
+    connect(undoBtn,&QPushButton::clicked,this,[=]()
+            {
+                //controller->undo();
+                updateGame(controller->getState().bottles);
+            });
+
+    connect(aiBtn,&QPushButton::clicked,this,[=]()
+            {
+                qDebug()<<"AI solving...";//暂时没实现
+            });
+
+    updateGame(controller->getState().bottles);
 }
 
 void MainWindow::updateGame(const std::vector<std::vector<int>>& bottles)
@@ -33,30 +81,31 @@ void MainWindow::updateGame(const std::vector<std::vector<int>>& bottles)
     }
 }
 
-// void MainWindow::animatePour(int from,int to)
-// {
-//     BottleWidget* b1 = bottleWidgets[from];
+void MainWindow::onBottleClicked(BottleWidget* b)
+{
+    int idx = -1;
 
-//     QPropertyAnimation* anim = new QPropertyAnimation(b1,"angle");
+    for(int i=0;i<bottleWidgets.size();i++)
+    {
+        if(bottleWidgets[i]==b)
+        {
+            idx=i;
+            break;
+        }
+    }
 
-//     anim->setDuration(300);
+    if(idx==-1) {return;}
+    // 第一次点击
+    if(selected==-1)
+    {
+        selected=idx;
+        return;
+    }
 
-//     anim->setStartValue(0);
-//     anim->setEndValue(-40);
+    // 第二次点击
+    controller->playerMove(selected,idx);
 
-//     anim->setEasingCurve(QEasingCurve::InOutQuad);
+    selected=-1;
 
-//     connect(anim,&QPropertyAnimation::finished,[=]()
-//             {
-//                 QPropertyAnimation* back = new QPropertyAnimation(b1,"angle");
-
-//                 back->setDuration(300);
-
-//                 back->setStartValue(-40);
-//                 back->setEndValue(0);
-
-//                 back->start();
-//             });
-
-//     anim->start();
-// }
+    updateGame(controller->getState().bottles);
+}

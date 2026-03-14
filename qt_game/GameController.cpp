@@ -13,9 +13,10 @@
 
 #include<QCoreApplication> //用于自动退出，QCoreApplication::quit() //only test
 
-GameController::GameController(int bottleCount,int capacity)
-    : game(bottleCount,capacity),bottleCount(bottleCount),capacity(capacity)
+GameController::GameController(int bottleCount,int capacity,int colorCount)
+    : game(bottleCount,capacity,colorCount),bottleCount(bottleCount),capacity(capacity),colorCount(colorCount)
 {
+
     solverProcess = new QProcess(this);
 
     solverTimer = new QTimer(this);
@@ -31,17 +32,23 @@ GameController::GameController(int bottleCount,int capacity)
 
 }
 
-void GameController::newGame(int colorCount)
+void GameController::newGame()
 {
-    game = GameState(bottleCount,capacity);
+    game = GameState(bottleCount,capacity,colorCount);
 
-    LevelGenerator::generate(game,colorCount);
+    LevelGenerator::generate(game);
 }
 
 bool GameController::playerMove(int from,int to)
 {
+    qDebug()<<"from"<<from<<"size"<<game.bottles[from].size();
+    qDebug()<<"to"<<to<<"size"<<game.bottles[to].size();
+    qDebug()<<"star playMove()";
     if(!game.canPour(from,to))
-    {return false;}
+    {
+        qDebug()<<"can't canPour";
+        return false;
+    }
     game.pour(from,to);
 
     return true;
@@ -129,6 +136,26 @@ void GameController::startAutoSolve()
 {
     //currentStep=0;
     //solverTimer->start(500);
+}
+
+const GameState &GameController::getState() const
+{
+    return game;
+}
+
+int GameController::getBottleCount()
+{
+    return bottleCount;
+}
+
+int GameController::getCapacity()
+{
+    return capacity;
+}
+
+int GameController::getColorCount()
+{
+    return colorCount;
 }
 
 void GameController::stepSolve()

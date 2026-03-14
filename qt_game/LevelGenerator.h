@@ -7,8 +7,7 @@
 class LevelGenerator
 {
 public:
-    static void generate(GameState& game,int colorCount);
-    //static void generate_hard(GameState &game, int colorCount);
+    static void generate(GameState& game);
 };
 
 #endif // LEVELGENERATOR_H

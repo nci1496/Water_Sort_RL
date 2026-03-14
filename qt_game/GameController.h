@@ -10,9 +10,9 @@ class GameController: public QObject //
     Q_OBJECT //不加继承自QObject的话，用不了connect
 public:
 
-    GameController(int bottleCount,int capacity);
+    GameController(int bottleCount,int capacity,int colorCount);
 
-    void newGame(int colorCount);
+    void newGame();
 
     bool playerMove(int from,int to);
 
@@ -24,7 +24,11 @@ public:
 
     void executeSolution();//一次性直接执行完
     void startAutoSolve();//一步一步来，快慢受solverTimer控制
+    const GameState& getState() const;
 
+    int getBottleCount();
+    int getCapacity();
+    int getColorCount();
 
 private slots:
     void stepSolve();
@@ -35,9 +39,10 @@ private:
 
     std::vector<std::pair<int,int>> solution;
 
+
     int bottleCount;
     int capacity;
-
+    int colorCount;
 
     GameState game;
     QProcess* solverProcess;

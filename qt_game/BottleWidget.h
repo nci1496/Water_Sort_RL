@@ -14,11 +14,16 @@ public:
 
 protected:
     void paintEvent(QPaintEvent* event)override;
+    void mousePressEvent(QMouseEvent*)override;
 
 private:
     std::vector<int> water;
     int capacity;
 signals:
+    void clicked(BottleWidget*);
+
+
+
 };
 
 #endif // BOTTLEWIDGET_H

@@ -109,3 +109,8 @@ void BottleWidget::paintEvent(QPaintEvent*)
     painter.drawRoundedRect(15,15,8,h-30,6,6);
 }
 
+void BottleWidget::mousePressEvent(QMouseEvent *)
+{
+    emit clicked(this);
+}
+

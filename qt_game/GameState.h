@@ -7,7 +7,7 @@
 class GameState
 {
 public:
-    GameState(int bottleCount,int capacity);
+    GameState(int bottleCount,int capacity,int colorCount);
 
     bool canPour(int from,int to) const;
 
@@ -21,6 +21,8 @@ public:
 
     int capacity;
     int bottleCount;
+
+    int colorCount;
 
     std::vector<std::vector<int>> bottles;
 
